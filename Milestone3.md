@@ -1,5 +1,5 @@
 ---
-title: training set baseline accuracy
+title: Milestone 3
 notebook: Milestone3.ipynb
 nav_include: 1
 ---
@@ -3820,6 +3820,7 @@ As we noted previously, the label data is imbalanced. In the baseline we will co
 ```python
 most_common_class = data_train['Risk'].value_counts().idxmax()
 
+## training set baseline accuracy
 baseline_accuracy = np.sum(data_train['Risk']==most_common_class)/len(data_train)
 
 print("Classification accuracy (training set) if we predict all loans to be fully paid: {:.3f}"
