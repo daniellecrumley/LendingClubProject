@@ -1,9 +1,17 @@
+---
+title: training set baseline accuracy
+notebook: Milestone3.ipynb
+nav_include:1
+---
 
-# <img style="float: left; padding-right: 10px; width: 45px" src="https://raw.githubusercontent.com/Harvard-IACS/2018-CS109A/master/content/styles/iacs.png"> CS109A Introduction to Data Science
+## Contents
+{:.no_toc}
+*  
+{: toc}
 
 
 
-# Final Project -  Lending Club Investments <img style="float: right; padding-right: 10px; width: 150px" src="https://i.imgur.com/2ptDvXd.png">
+
 
 
 **Harvard University**<br/>
@@ -337,10 +345,8 @@ We will generate a <b>Risk</b> label where:
 
 
 ```python
-# Low Risk
 loan_df['Risk'] = np.where(loan_df['loan_status']=='Fully Paid',0,np.nan)
 
-# High Risk
 loan_df['Risk'] = np.where(loan_df['loan_status']=='Charged Off',1,loan_df['Risk'])
 ```
 
@@ -3814,7 +3820,6 @@ As we noted previously, the label data is imbalanced. In the baseline we will co
 ```python
 most_common_class = data_train['Risk'].value_counts().idxmax()
 
-# training set baseline accuracy
 baseline_accuracy = np.sum(data_train['Risk']==most_common_class)/len(data_train)
 
 print("Classification accuracy (training set) if we predict all loans to be fully paid: {:.3f}"
