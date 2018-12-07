@@ -1,6 +1,5 @@
 ---
 title: Lending Club - Project Overview
-nav_include:2
 ---
 ## Lending Club Project Overview
 
