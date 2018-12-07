@@ -1,9 +1,12 @@
 ---
 title: Lending Club: Project Overview
 ---
+# Lending Club Project - Overview
 
 CSCI E-109A Final Project
+
 Project Group #47
+
 December 12, 2018
 
 Victor Chen, Danielle Crumley, Mohamed ElSalmi, and John Kang
