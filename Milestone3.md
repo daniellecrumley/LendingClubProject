@@ -1,9 +1,3 @@
----
-title: Milestone 3
-notebook: Milestone3.ipynb
-nav_include: 1
----
-
 
 # <img style="float: left; padding-right: 10px; width: 45px" src="https://raw.githubusercontent.com/Harvard-IACS/2018-CS109A/master/content/styles/iacs.png"> CS109A Introduction to Data Science
 
@@ -24,7 +18,7 @@ Hoon Kang<br/>
 
 <hr style="height:1.5pt">
 
-### <font color='maroon'>Data Collection</font>
+## <font color='maroon'>Data Collection</font>
 
 
 
@@ -306,7 +300,7 @@ loan_df.head(5)
 
 
 <hr style="height:1.5pt">
-### <font color='maroon'>Generate Labels for the Response Variable</font>
+## <font color='maroon'>Generate Labels for the Response Variable</font>
 <br>We'd like to use <b>loan_status</b> as the basis for our response variable.
 <br>There is a very clear signal on the risk of a loan when a loan is fully paid vs. charged off. <br>We can only use loans that have been closed as any open loans may still go either way. 
 
@@ -371,7 +365,7 @@ loan_df.groupby('Risk')['Risk'].agg('count').sort_values(ascending=False)
 
 
 <hr style="height:1.5pt">
-### <font color='maroon'>EDA</font>
+## <font color='maroon'>EDA</font>
 
 
 
@@ -2291,7 +2285,7 @@ loan_df = loan_df.drop(['Total_Loan_Age', 'interest_rate'],1)
 ```
 
 
-### <font color='maroon'>Data Cleaning</font>
+## <font color='maroon'>Data Cleaning</font>
 
 
 <b>Check for and Clean Missing Data</b>
@@ -3364,7 +3358,7 @@ missing_values.head(5)
 
 
 <hr style="height:1.5pt">
-### <font color='maroon'>Random Forest Feature Importances</font>
+## <font color='maroon'>Random Forest Feature Importances</font>
 <br>We currently still have a large number of columns that we'd like to narrow down. 
 <br>We will train a Random Forest Classifier and use the feature importances to select the top features.
 <br>We specifically set max_depth=None to allow for all features to be incorporated.
@@ -3783,7 +3777,7 @@ top_features
 
 
 <hr style="height:1.5pt">
-### <font color='maroon'>Baseline Model - Decision Tree Classifier</font>
+## <font color='maroon'>Baseline Model - Decision Tree Classifier</font>
 
 
 Since we have performed feature selection using Random Forest, we will use a single Decision Tree as our baseline with the top features chosen by feature importances. 
