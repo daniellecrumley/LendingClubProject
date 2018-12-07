@@ -1,7 +1,7 @@
 ---
-title: Lending Club: Project Overview
+title: Lending Club - Project Overview
+nav_include:0
 ---
-## Lending Club Project - Overview
 
 CSCI E-109A Final Project
 
