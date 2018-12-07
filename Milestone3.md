@@ -3,7 +3,7 @@
 
 
 
-## Final Project -  Lending Club Investments <img style="float: right; padding-right: 10px; width: 150px" src="https://i.imgur.com/2ptDvXd.png">
+# Final Project -  Lending Club Investments <img style="float: right; padding-right: 10px; width: 150px" src="https://i.imgur.com/2ptDvXd.png">
 
 
 **Harvard University**<br/>
