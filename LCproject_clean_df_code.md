@@ -1,5 +1,5 @@
 ---
-title: Data Collection, Cleaning, Pre-Processing
+title: Data Collection and Cleaning
 notebook: LCproject_clean_df_code.ipynb
 nav_include: 1
 ---
