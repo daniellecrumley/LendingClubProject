@@ -1,6 +1,6 @@
 ---
 title: Data Collection and Cleaning
-notebook: LCproject_clean_df_code.ipynb
+notebook: data-cleaning.ipynb
 nav_include: 1
 ---
 
@@ -226,7 +226,7 @@ sns.despine()
 
 
 
-![png](LCproject_clean_df_code_files/LCproject_clean_df_code_11_1.png)
+![png](data-cleaning_files/data-cleaning_11_1.png)
 
 
 Upon first glance, we see that there are many columns that do have a reasonably low level of missingess: 87 columns that have less than 15% missing values.
@@ -1395,8 +1395,8 @@ print('emp_length value counts: \n{}\n'.format(loan_df.emp_length.value_counts()
     1 year        3537
     5 years       3328
     4 years       3255
-    6 years       2554
     8 years       2554
+    6 years       2554
     7 years       2472
     9 years       2124
     Name: emp_length, dtype: int64
@@ -2019,21 +2019,43 @@ loan_df = loan_df[loan_df['issue_d']>=datetime(2012,8,1)]
 
 loan_df = process_loan_cols(loan_df)
 
-object_vars=loan_df.select_dtypes(include='object').columns.tolist()
-object_vars = np.setdiff1d(object_vars,['addr_state', 'zip_code'])
-loan_df = pd.get_dummies(loan_df,columns=object_vars,drop_first=True)
+object_vars = loan_df.select_dtypes(include='object').columns.tolist()
+vars_for_dummies = np.setdiff1d(object_vars,['addr_state', 'zip_code'])
+
+tmp_df = loan_df[vars_for_dummies]
+loan_df = pd.get_dummies(loan_df,columns=vars_for_dummies,drop_first=True)
 
 missing_cols = loan_df.columns[loan_df.isnull().any()].tolist()
 
 clean_df = impute_missing_continuous(loan_df, missing_columns=missing_cols,
                                      cols_to_exclude=['fully_paid','issue_d', 'zip_code', 'addr_state'])
+
+for col in vars_for_dummies:
+    clean_df[col] = tmp_df[col]
+
+print(sorted(clean_df.columns.tolist()))
 ```
+
+
+    ['acc_now_delinq', 'acc_open_past_24mths', 'addr_state', 'annual_inc', 'application_type', 'application_type_Joint App', 'avg_cur_bal', 'bc_open_to_buy', 'bc_util', 'chargeoff_within_12_mths', 'collections_12_mths_ex_med', 'credit_line_age', 'delinq_2yrs', 'delinq_amnt', 'dti', 'emp_length', 'emp_length_10+ years', 'emp_length_2-4 years', 'emp_length_5-9 years', 'fully_paid', 'grade', 'home_ownership', 'home_ownership_MORTGAGE', 'home_ownership_NONE', 'home_ownership_OTHER', 'home_ownership_OWN', 'home_ownership_RENT', 'inq_last_6mths', 'installment', 'int_rate', 'issue_d', 'loan_amnt', 'mo_sin_old_il_acct', 'mo_sin_old_rev_tl_op', 'mo_sin_rcnt_rev_tl_op', 'mo_sin_rcnt_tl', 'mort_acc', 'mths_since_last_delinq', 'mths_since_last_major_derog', 'mths_since_last_record', 'mths_since_recent_bc', 'mths_since_recent_bc_dlq', 'mths_since_recent_inq', 'mths_since_recent_revol_delinq', 'num_accts_ever_120_pd', 'num_actv_bc_tl', 'num_actv_rev_tl', 'num_bc_sats', 'num_bc_tl', 'num_il_tl', 'num_op_rev_tl', 'num_rev_accts', 'num_rev_tl_bal_gt_0', 'num_sats', 'num_tl_90g_dpd_24m', 'num_tl_op_past_12m', 'open_acc', 'pct_tl_nvr_dlq', 'percent_bc_gt_75', 'pub_rec', 'pub_rec_bankruptcies', 'purpose', 'purpose_credit_card', 'purpose_debt_consolidation', 'purpose_educational', 'purpose_home_improvement', 'purpose_house', 'purpose_major_purchase', 'purpose_medical', 'purpose_moving', 'purpose_other', 'purpose_renewable_energy', 'purpose_small_business', 'purpose_vacation', 'purpose_wedding', 'revol_bal', 'revol_util', 'sub_grade', 'tax_liens', 'term', 'term_ 60 months', 'tot_coll_amt', 'tot_cur_bal', 'tot_hi_cred_lim', 'total_acc', 'total_bal_ex_mort', 'total_bc_limit', 'total_il_high_credit_limit', 'total_rev_hi_lim', 'verification_status', 'verification_status_Source Verified', 'verification_status_Verified', 'zip_code']
 
 
 
 
 ```python
-clean_df.to_pickle('./data/Pickle/clean_df.pkl')
+print(clean_df.shape)
+#print(vars_for_dummies)
+```
+
+
+    (1087436, 93)
+
+
+
+
+```python
+clean_df.to_pickle('./data/Pickle/clean_df_for_eda.pkl')
+
 ```
 
 
