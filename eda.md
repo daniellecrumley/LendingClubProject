@@ -1,6 +1,6 @@
 ---
 title: Exploratory Data Analysis
-notebook: eda.ipynb
+notebook: EDA.ipynb
 nav_include: 2
 ---
 
@@ -75,7 +75,7 @@ plt.tight_layout()
 
 
 
-![png](eda_files/eda_6_0.png)
+![png](EDA_files/EDA_6_0.png)
 
 
 ### Loan Outcome by Grade and Subgrade
@@ -104,7 +104,7 @@ fig.tight_layout()
 
 
 
-![png](eda_files/eda_8_0.png)
+![png](EDA_files/EDA_8_0.png)
 
 
 ### Loan Amount by Grade and Subgrade
@@ -129,7 +129,7 @@ sns.barplot(x='grade', y='loan_amnt', data=avg_loan, palette='Set2'
 
 
 
-![png](eda_files/eda_10_0.png)
+![png](EDA_files/EDA_10_0.png)
 
 
 
@@ -146,7 +146,7 @@ sns.barplot(x='sub_grade', y='loan_amnt', data=avg_loan, palette='Set2'
 
 
 
-![png](eda_files/eda_11_0.png)
+![png](EDA_files/EDA_11_0.png)
 
 
 ### Number of Loans in Dataset by State
@@ -166,7 +166,7 @@ plt.tight_layout()
 
 
 
-![png](eda_files/eda_13_0.png)
+![png](EDA_files/EDA_13_0.png)
 
 
 
@@ -648,7 +648,7 @@ sns.despine();
 
 
 
-![png](eda_files/eda_17_0.png)
+![png](EDA_files/EDA_17_0.png)
 
 
 ### Distribution of Annual Income
@@ -673,7 +673,7 @@ sns.despine();
 
 
 
-![png](eda_files/eda_19_0.png)
+![png](EDA_files/EDA_19_0.png)
 
 
 ### Borrower's Debt-to-Income Ratio vs. Lending Club Interest Rate (by Loan Grade)
@@ -708,7 +708,7 @@ ax.legend(loc='best');
 
 
 
-![png](eda_files/eda_21_0.png)
+![png](EDA_files/EDA_21_0.png)
 
 
 ### Loan Purpose Distribution
@@ -730,7 +730,7 @@ plt.title('Number of Loans by Loan Purpose');
 
 
 
-![png](eda_files/eda_23_0.png)
+![png](EDA_files/EDA_23_0.png)
 
 
 ### Removing Excess Columns
