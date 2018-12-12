@@ -1,7 +1,8 @@
 ---
-title: Lending Club Investments Project: Overview<img style="float: right; padding-right: 10px; width: 150px" src="https://i.imgur.com/2ptDvXd.png">
+title: Lending Club Investments Project: Overview
 notebook: index.ipynb
 ---
+<img style="float: right; padding-right: 10px; width: 150px" src="https://i.imgur.com/2ptDvXd.png">
 
 ## Contents
 {:.no_toc}
