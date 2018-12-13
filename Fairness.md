@@ -4,7 +4,6 @@ notebook: Fairness.ipynb
 nav_include : 5
 ---
 
-## Contents
 {:.no_toc}
 *  
 {: toc}
