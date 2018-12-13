@@ -1,5 +1,5 @@
 ---
-title: Fairness: Bias Detection and Mitigation
+title: Fairness - Bias Detection and Mitigation
 notebook: Fairness.ipynb
 nav_include: 4
 ---
