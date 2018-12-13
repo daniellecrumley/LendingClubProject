@@ -47,22 +47,22 @@ Our data explorataion, cleaning, processing, and modeling and fairness adjustmen
 ## <font color='maroon'>Sources</font>
 
 
-1. Kamiran, F. & Calders, T. Knowl Inf Syst (2012) 33: 1. https://doi.org/10.1007/s10115-011-0463-8
+**Kamiran, F. & Calders, T. Knowl Inf Syst (2012) 33: 1. https://doi.org/10.1007/s10115-011-0463-8**
 
 This paper provides a method that allows us to debias a dataset exhibiting unlawful discrimination. It shows how to feed a data into a model that does not exhibit this discrimination whilst optimizing accuracy. In this paper, we concentrate on the case with only one binary sensitive attribute and a two-class classification problem we study the theoretically optimal trade-off between accuracy and non-discrimination for pure classifiers. 
 
-2. Bellamy, Rachel K.E., et al. AI Fairness 360: An Extensible Toolkit for Detecting, Understanding, and Mitigating Unwanted Algorithmic Bias. 3 Oct. 2018, doi:https://arxiv.org/abs/1810.01943.
+**Bellamy, Rachel K.E., et al. AI Fairness 360: An Extensible Toolkit for Detecting, Understanding, and Mitigating Unwanted Algorithmic Bias. 3 Oct. 2018, doi:https://arxiv.org/abs/1810.01943.**
 
 Fairness is an increasingly important concern as machine learning models are used to support decision making in high-stakes applications such as mortgage lending, hiring, and prison sentencing. This paper introduces a new open source Python toolkit for algorithmic fairness, AI Fairness 360 (AIF360), released under an Apache v2.0 license {this https URL). The main objectives of this toolkit are to help facilitate the transition of fairness research algorithms to use in an industrial setting and to provide a common framework for fairness researchers to share and evaluate algorithms. 
 The package includes a comprehensive set of fairness metrics for datasets and models, explanations for these metrics, and algorithms to mitigate bias in datasets and models. It also includes an interactive Web experience (this https URL) that provides a gentle introduction to the concepts and capabilities for line-of-business users, as well as extensive documentation, usage guidance, and industry-specific tutorials to enable data scientists and practitioners to incorporate the most appropriate tool for their problem into their work products. The architecture of the package has been engineered to conform to a standard paradigm used in data science, thereby further improving usability for practitioners. Such architectural design and abstractions enable researchers and developers to extend the toolkit with their new algorithms and improvements, and to use it for performance benchmarking. A built-in testing infrastructure maintains code quality.
 
 
-3. Emekter, Riza, et al. Evaluating Credit Risk and Loan Performance in Online Peer-to-Peer (P2P) Lending. Applied Economics, vol. 47, no. 1, 2014, pp. 5470., doi:10.1080/00036846.2014.962222.
+**Emekter, Riza, et al. Evaluating Credit Risk and Loan Performance in Online Peer-to-Peer (P2P) Lending. Applied Economics, vol. 47, no. 1, 2014, pp. 5470., doi:10.1080/00036846.2014.962222.**
 
 This paper sheds light on P2P lending, utilizing this paper we were able to better understand how websites such as The Lending Club works and what factors would be influential in the evaluation of credit risk. 
 
 
-4. ONeil, Cathy. Weapons of Math Destruction: How Big Data Increases Inequality and Threatens Democracy. Penguin Books, 2018.
+**ONeil, Cathy. Weapons of Math Destruction: How Big Data Increases Inequality and Threatens Democracy. Penguin Books, 2018.**
 
 O'Neil, a mathematician, analyses how the use of big data and algorithms in a variety of fields, including insurance, advertising, education, and policing, can lead to decisions that harm the poor, reinforce discrimination, and amplify inequality. This book has been especially helpful in informing us how modern-day credit score systems can be severely biased and discriminatory. Having a high-level of understanding of the topic assisted us in making several key decisions in designing our model and addressing fairness.  
 
