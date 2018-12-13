@@ -21,7 +21,7 @@ Hoon Kang<br/>
 
 ## <font color='maroon'>Background Information</font>
 
-The Lending Club is a peer-to-peer lending network for loans ranging from $1,000 to $40,000. The Lending Club provides a large amount of loan data online so that its investors can make their own informed investment decisions. This online data dates from 2007 to Q2 2018 and provides certain borrower demographic and credit history information, as well as loan-specific information (including the purpose of the loan, the amount requested and amount funded, the interest rate, and the loan grade assigned by the Lending Club).
+The Lending Club is a peer-to-peer lending network for loans ranging from `$1,000` to `$40,000`. The Lending Club provides a large amount of loan data online so that its investors can make their own informed investment decisions. This online data dates from 2007 to Q2 2018 and provides certain borrower demographic and credit history information, as well as loan-specific information (including the purpose of the loan, the amount requested and amount funded, the interest rate, and the loan grade assigned by the Lending Club).
 
 ## <font color='maroon'>Project Aim</font>
 
