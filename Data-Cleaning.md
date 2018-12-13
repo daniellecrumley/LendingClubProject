@@ -1,14 +1,5 @@
----
-title: Data Collection and Cleaning
-notebook: data-cleaning.ipynb
-nav_include: 1
----
 
-## Contents
-{:.no_toc}
-*  
-{: toc}
-
+# Data Collection, Cleaning, and Pre-Processing
 
 
 ## <font color='maroon'>Data Collection</font>
@@ -64,7 +55,7 @@ def get_loan_data(data_path, other_data_paths=None):
     """Read CSV files containing loan data from specified data path
     and concatenate to one dataframe
     returns: the dataframe"""
-
+    
     if other_data_paths:
         paths = [data_path] + other_data_paths
     else:
@@ -80,12 +71,12 @@ def get_loan_data(data_path, other_data_paths=None):
         print('Reading:', each)
         df_list.append(pd.read_csv(each, header=1, skipfooter=2, engine='python'))
         clear_output(wait=True)
-
+    
     df = pd.concat(df_list)
 
     #Remove any excess rows that do not fit ('id' should always be empty)
     df = df[df['id'].isnull()]        
-
+    
     return df
 
 #loan_df = get_loan_data(data_path='./data/', other_data_paths=['./data/old'])
@@ -135,13 +126,13 @@ print('Total Number of Columns:', '{:,}'.format(loan_df.shape[1]))
 def get_missing_values_table(df):
     #Number of null values by column
     missing_values_df = pd.DataFrame(df.isnull().sum(),columns=['Missing_Count'])
-
+    
     #Portion of null values by column
     missing_values_df['Portion_Missing'] = missing_values_df['Missing_Count']/df.shape[0]
 
     #Sort by Missing_Count
     missing_values_df = missing_values_df.sort_values(by='Missing_Count',ascending=False)  
-
+    
     return missing_values_df
 
 missing_values_df = get_missing_values_table(loan_df)
@@ -209,7 +200,7 @@ missing_values_df.head()
 
 
 ```python
-print('Number of Columns with under 15% missing values:',
+print('Number of Columns with under 15% missing values:', 
       missing_values_df[missing_values_df['Portion_Missing']<=0.15].shape[0])
 
 #Plot the distribution of Portions of missing values for the columns
@@ -226,13 +217,13 @@ sns.despine()
 
 
 
-![png](data-cleaning_files/data-cleaning_11_1.png)
+![png](Data-Cleaning_files/Data-Cleaning_11_1.png)
 
 
 Upon first glance, we see that there are many columns that do have a reasonably low level of missingess: 87 columns that have less than 15% missing values.
 <br><br>There seems to be a small concentration of columns between 60-70% missing values. Below, we explore this and see that there are 11 columns with almost exactly the same number of missing values. Furthermore, using the `issue_d` column (which indicates the date the date in which the loan was issued), we found that these variables had missing values for all loans issued prior to 2015-12-01. It's possible that the Lending Club simply did not record or use this particular information from potential borrowers until a later date. We have chosen not to include these columns because:
 
-1) there are many other columns that capture similar credit-related information; and
+1) there are many other columns that capture similar credit-related information; and 
 
 2) we want to keep the older loan information in the dataset, especially since we are looking at only completed loans. Removing the older samples would greatly reduce our sample size.
 
@@ -247,7 +238,7 @@ missing_columns = missing_grp.index
 
 earliest_date = []
 for column in missing_columns:
-    earliest_date.append(min(loan_df[~loan_df[column].isnull()]['issue_d']))
+    earliest_date.append(min(loan_df[~loan_df[column].isnull()]['issue_d'])) 
 
 display(pd.DataFrame({'Column':missing_columns,
                       'Earliest issue_d for which column value is not null':earliest_date}))
@@ -471,7 +462,7 @@ display(pd.DataFrame({'Column':missing_columns,
 *  We exclude columns related to the specifics of loan settlement, something we wouldn't know at the time of funding (and in our case these are very trivial features relating to a loan being charged off): `debt_settlement_flag`, `debt_settlement_flag_date`,`settlement_amount`, `settlement_date`, `settlement_percentage`, `settlement_status`, `settlement_term`, `recoveries`, `collection_recovery_fee`
 
 *  We also excluded the following colums since they include information relating to the specifics of the Lending Club's loan (including information on late fees received on the lending club loan, last payment amount on the lending club loan, etc.), which also wouldn't be available at the time of the funding decision: `funded_amnt`, `funded_amnt_inv`, `last_pymnt_amnt`, `out_prncp`, `out_prncp_inv`,  `total_pymnt`, `total_pymnt_inv`, `total_rec_int`, `total_rec_late_fee`, `total_rec_prncp`, `last_pymnt_d`,  `last_credit_pull_d`, `disbursement_method`
-
+ 
 *  We exclude `initial_list_status` based on research into the meaning of this column.  "On September 28th, 2012, LendingClub announced that, as opposed to its standard fractional investment business model, it would begin setting aside some loans that could only be purchased in their entirety–or as whole loans. Part of that announcement were promises that whole loans would be chosen randomly from the general pool and that anyone would be able to participate in the whole loan program"(https://www.lendacademy.com/lending-club-whole-loan-program-one-year-later/). Because the whole loans are randomly-chosen, they should not provide additional information. Also, we noticed that there are more "whole"-category loans in later years.
 
 **Text descriptions of the variables that remain in our model after cleaning are provided at the end of this page.**
@@ -520,11 +511,11 @@ def view_missingness_by_issue_d(df):
                                            (missing_values_df.Missing_Count >0)].index
 
     for column in cols_with_missing_vals:
-        earliest_date.append(min(loan_df[~loan_df[column].isnull()]['issue_d']))
+        earliest_date.append(min(loan_df[~loan_df[column].isnull()]['issue_d'])) 
 
     df = pd.DataFrame({'Column':cols_with_missing_vals,
                       'Earliest issue_d for which column value is not null':earliest_date})
-
+    
     return df.sort_values(by='Earliest issue_d for which column value is not null', ascending=False)
 
 view_missingness_by_issue_d(loan_df).head(15)
@@ -638,7 +629,7 @@ view_missingness_by_issue_d(loan_df).head(15)
 
 
 
-Now, we see that there are columns relating to details of applications that have multiple borrowers (co-borrowers). These columns only have non-null values from issue dates of 2017-03-01 and later (or 2015-10-01 and later for 'dti_joint', 'annual_inc_joint', and 'verification_status_joint'), so we remove these columns. We remove all of these columns:
+Now, we see that there are columns relating to details of applications that have multiple borrowers (co-borrowers). These columns only have non-null values from issue dates of 2017-03-01 and later (or 2015-10-01 and later for 'dti_joint', 'annual_inc_joint', and 'verification_status_joint'), so we remove these columns. We remove all of these columns: 
 
 `annual_inc_joint`, `dti_joint`, `revol_bal_joint`, `sec_app_chargeoff_within_12_mths`, `sec_app_collections_12_mths_ex_med`, `sec_app_earliest_cr_line`, `sec_app_inq_last_6mths`, `sec_app_mort_acc`, `sec_app_mths_since_last_major_derog`, `sec_app_num_rev_accts`, `sec_app_open_acc`, `sec_app_open_act_il`, `sec_app_revol_util`, `verification_status_joint`]
 
@@ -1033,6 +1024,7 @@ get_missing_values_table(loan_df).head(15)
 ```python
 print("Number of rows in dataset: {}".format (loan_df.shape[0]))
 
+# removing data from loans issued prior to 2012-08-01
 loan_df = loan_df[loan_df['issue_d']>=datetime(2012,8,1)]
 
 
@@ -1387,7 +1379,7 @@ print('emp_length value counts: \n{}\n'.format(loan_df.emp_length.value_counts()
 ```
 
 
-    emp_length value counts:
+    emp_length value counts: 
     10+ years    18067
     2 years       4761
     3 years       4403
@@ -1400,7 +1392,7 @@ print('emp_length value counts: \n{}\n'.format(loan_df.emp_length.value_counts()
     7 years       2472
     9 years       2124
     Name: emp_length, dtype: int64
-
+    
 
 
 
@@ -1415,7 +1407,7 @@ def process_emp_length(df):
     #2-4 years inclues: 2 years, 3 years, 4 years
     df_new['emp_length'] = np.where(df_new['emp_length'].isin(['2 years','3 years','4 years']),
                                      '2-4 years',df_new['emp_length'])
-
+    
     #5-9 years inclues: 5 years, 6 years, 7 years, 8 years, 9 years
     df_new['emp_length'] = np.where(df_new['emp_length'].isin(['5 years','6 years','7 years','8 years','9 years']),
                                      '5-9 years',df_new['emp_length'])
@@ -1424,11 +1416,11 @@ def process_emp_length(df):
 
 def process_revol_util(df):
     df_new = df.copy()
-
+    
     df_new['revol_util'] = df_new['revol_util'].fillna(-100)
     df_new['revol_util'] = df_new['revol_util'].apply(lambda x: float(str(x).split('%')[0])/100)
     df_new['revol_util'] = np.where(df_new['revol_util']==-1.0,np.nan,df_new['revol_util'])
-
+    
     return df_new
 
 def process_month_since_cols(df):
@@ -1441,30 +1433,30 @@ def process_month_since_cols(df):
 
     for col in mo_since_cols:
         df_new[col].fillna(df_new[col].max()+1, inplace=True)
-
+    
     return df_new
 
 def process_loan_grades(df):
     df_new = df.copy()
-
+    
     # turn sub_grade into ordinal mapping
     sorted_subgrades = sorted(df.sub_grade.unique())
     subgrade_dict = dict(zip(sorted_subgrades, range(len(sorted_subgrades))))
     df_new['sub_grade'] = df_new['sub_grade'].map(subgrade_dict)
-
+    
     # turn grade into ordinal mapping
     sorted_grades = sorted(df.grade.unique())
     grade_dict = dict(zip(sorted_grades, range(len(sorted_grades))))
     df_new['grade'] = df_new['grade'].map(grade_dict)
     return df_new
-
-
+    
+    
 def process_loan_cols(df):
     df_processed = process_emp_length(df)
     df_processed = process_revol_util(df_processed)
     df_processed = process_month_since_cols(df_processed)
     df_processed = process_loan_grades(df_processed)
-
+    
     #add credit_line_age
     df_processed['credit_line_age'] = df_processed['issue_d'] - pd.to_datetime(df_processed['earliest_cr_line'])
     df_processed = df_processed.drop(columns='earliest_cr_line')
@@ -1473,11 +1465,11 @@ def process_loan_cols(df):
     df_processed['int_rate'] = df_processed['int_rate'].apply(lambda x: float(str(x).split('%')[0])/100)
     df_processed['zip_code'] = df_processed['zip_code'].apply(lambda x: x[:3])
     df_processed['credit_line_age'] = df_processed['credit_line_age'].apply(lambda x: x.days)
-
+    
     # generate new column for outcome variable ('fully_paid'); drop 'loan_status'
     df_processed['fully_paid'] = df_processed['loan_status'].map({'Fully Paid':1, 'Charged Off':0})
     df_processed = df_processed.drop(columns='loan_status')
-
+    
     return df_processed
 
 loan_df = process_loan_cols(loan_df)
@@ -1496,6 +1488,7 @@ loan_df = process_loan_cols(loan_df)
 
 
 ```python
+# check which cols still have missing values
 missing_data = get_missing_values_table(loan_df)
 display(missing_data[missing_data.Missing_Count!=0])
 missing_cols = missing_data[missing_data.Missing_Count!=0].index
@@ -1644,7 +1637,7 @@ print(loan_df[missing_cols].dtypes.unique().tolist())
 </div>
 
 
-    datatypes of the columns that still have missing values:
+    datatypes of the columns that still have missing values: 
     [dtype('float64')]
 
 
@@ -1658,12 +1651,13 @@ types_df = pd.DataFrame(loan_df.dtypes,columns=['Types'])
 display(types_df[types_df['Types']!='float64'].sort_values(by='Types'))
 
 
+# get list of variables that need dummy encoding
 object_vars=loan_df.select_dtypes(include='object').columns.tolist()
 object_vars = np.setdiff1d(object_vars,['addr_state', 'zip_code'])
 print(object_vars)
 
 #Dummy encoding
-loan_df = pd.get_dummies(loan_df,columns=object_vars,drop_first=True)
+loan_df = pd.get_dummies(loan_df,columns=object_vars,drop_first=True) 
 
 ```
 
@@ -1777,7 +1771,7 @@ loan_df[missing_cols].dtypes.unique() # all float64
 ```python
 def impute_missing_continuous(df, missing_columns, cols_to_exclude):
     clean_df = df.copy()
-
+    
     for column in missing_columns:
         types_df = pd.DataFrame(df.dtypes,columns=['Types'])
         # Remove response variable
@@ -1795,7 +1789,7 @@ def impute_missing_continuous(df, missing_columns, cols_to_exclude):
         impute_ols.fit(X_impute_train,Y_impute_train)
 
         # Generate new temp column with model predictions
-        # Only replace rows where the value is null with the K-NN predicted value
+        # Only replace rows where the value is null with the K-NN predicted value 
         predictions = clean_df.drop(cols_to_exclude + [column],1)
 
         #Mean Imputation for current nulls for columns that did not get imputed yet
@@ -1804,7 +1798,7 @@ def impute_missing_continuous(df, missing_columns, cols_to_exclude):
 
         clean_df[column] = np.where(clean_df[column].isnull(),clean_df['temp'],clean_df[column])
         clean_df = clean_df.drop('temp',1)
-
+    
     return clean_df
 
 clean_df = impute_missing_continuous(loan_df, missing_columns=missing_cols, cols_to_exclude=['fully_paid','issue_d', 'zip_code', 'addr_state'])
@@ -1814,6 +1808,7 @@ clean_df = impute_missing_continuous(loan_df, missing_columns=missing_cols, cols
 
 
 ```python
+# verify that we no longer have null values
 clean_df.isnull().values.any()
 ```
 
@@ -1843,10 +1838,10 @@ for col in clean_df.dtypes[clean_df.dtypes!='float64'].index.tolist():
 ```
 
 
-    float64 columns:
+    float64 columns: 
     ['acc_now_delinq', 'acc_open_past_24mths', 'annual_inc', 'avg_cur_bal', 'bc_open_to_buy', 'bc_util', 'chargeoff_within_12_mths', 'collections_12_mths_ex_med', 'delinq_2yrs', 'delinq_amnt', 'dti', 'inq_last_6mths', 'installment', 'int_rate', 'loan_amnt', 'mo_sin_old_il_acct', 'mo_sin_old_rev_tl_op', 'mo_sin_rcnt_rev_tl_op', 'mo_sin_rcnt_tl', 'mort_acc', 'mths_since_last_delinq', 'mths_since_last_major_derog', 'mths_since_last_record', 'mths_since_recent_bc', 'mths_since_recent_bc_dlq', 'mths_since_recent_inq', 'mths_since_recent_revol_delinq', 'num_accts_ever_120_pd', 'num_actv_bc_tl', 'num_actv_rev_tl', 'num_bc_sats', 'num_bc_tl', 'num_il_tl', 'num_op_rev_tl', 'num_rev_accts', 'num_rev_tl_bal_gt_0', 'num_sats', 'num_tl_90g_dpd_24m', 'num_tl_op_past_12m', 'open_acc', 'pct_tl_nvr_dlq', 'percent_bc_gt_75', 'pub_rec', 'pub_rec_bankruptcies', 'revol_bal', 'revol_util', 'tax_liens', 'tot_coll_amt', 'tot_cur_bal', 'tot_hi_cred_lim', 'total_acc', 'total_bal_ex_mort', 'total_bc_limit', 'total_il_high_credit_limit', 'total_rev_hi_lim']
-
-    non-float64 columns:
+    
+    non-float64 columns: 
     addr_state                                     object
     grade                                           int64
     issue_d                                datetime64[ns]
@@ -1879,98 +1874,98 @@ for col in clean_df.dtypes[clean_df.dtypes!='float64'].index.tolist():
     verification_status_Source Verified             uint8
     verification_status_Verified                    uint8
     dtype: object
-
-
+    
+    
     Visualizing unique values for non-float64 variables (except for zip_code and issue_d)
-
+    
      addr_state
     ['FL' 'TX' 'CA' 'IN' 'MO' 'MI' 'GA' 'AZ' 'AL' 'CT' 'WA' 'MD' 'CO' 'IL'
      'PA' 'UT' 'SC' 'MN' 'NJ' 'OH' 'WI' 'NY' 'LA' 'NC' 'NH' 'DE' 'VA' 'WY'
      'TN' 'AR' 'KS' 'NV' 'DC' 'OK' 'MA' 'KY' 'RI' 'OR' 'HI' 'AK' 'NM' 'ND'
      'WV' 'ME' 'MT' 'MS' 'NE' 'SD' 'ID' 'VT']
-
+    
      grade
     [1 0 2 6 3 4 5]
-
+    
      sub_grade
     [ 8  0 11  5  2  4 12 14 32 17  9  7 10 15 21 27 18 13 19 20 16  6 22  1
       3 24 23 25 33 28 26 30 34 29 31]
-
+    
      credit_line_age
     [ 7671  5599  1249 ... 14885 15034 18292]
-
+    
      fully_paid
     [0 1]
-
+    
      application_type_Joint App
     [0 1]
-
+    
      emp_length_10+ years
     [1 0]
-
+    
      emp_length_2-4 years
     [0 1]
-
+    
      emp_length_5-9 years
     [0 1]
-
+    
      home_ownership_MORTGAGE
     [1 0]
-
+    
      home_ownership_NONE
     [0 1]
-
+    
      home_ownership_OTHER
     [0 1]
-
+    
      home_ownership_OWN
     [0 1]
-
+    
      home_ownership_RENT
     [0 1]
-
+    
      purpose_credit_card
     [1 0]
-
+    
      purpose_debt_consolidation
     [0 1]
-
+    
      purpose_home_improvement
     [0 1]
-
+    
      purpose_house
     [0 1]
-
+    
      purpose_major_purchase
     [0 1]
-
+    
      purpose_medical
     [0 1]
-
+    
      purpose_moving
     [0 1]
-
+    
      purpose_other
     [0 1]
-
+    
      purpose_renewable_energy
     [0 1]
-
+    
      purpose_small_business
     [0 1]
-
+    
      purpose_vacation
     [0 1]
-
+    
      purpose_wedding
     [0 1]
-
+    
      term_ 60 months
     [0 1]
-
+    
      verification_status_Source Verified
     [0 1]
-
+    
      verification_status_Verified
     [0 1]
 
@@ -1991,6 +1986,7 @@ Since we worked on a subset above, we redo our cleaning on the full dataset and 
 ```python
 loan_df = pd.read_pickle('./data/Pickle/loan_df0.pkl')
 
+# this includes co-borrower columns
 exclude = ['id', 'member_id', 'url', 'next_pymnt_d', 'pymnt_plan', 'out_prncp',
            'out_prncp_inv', 'policy_code', 'open_acc_6m', 'open_act_il', 'open_il_12m',
            'open_il_24m', 'total_bal_il', 'open_rv_12m', 'open_rv_24m', 'max_bal_bc',
@@ -2012,27 +2008,34 @@ exclude = ['id', 'member_id', 'url', 'next_pymnt_d', 'pymnt_plan', 'out_prncp',
            'sec_app_open_acc', 'sec_app_open_act_il', 'sec_app_revol_util',
            'verification_status_joint']
 
+# remove above columns
 potential_features = np.setdiff1d(loan_df.columns.tolist(), exclude)
 loan_df = loan_df[potential_features]
 
+# removing data from loans issued prior to 2012-08-01
 loan_df = loan_df[loan_df['issue_d']>=datetime(2012,8,1)]
 
+# process the columns that we identified as needing to be pre-processed
 loan_df = process_loan_cols(loan_df)
 
+# dummy-encoding for certain columns
 object_vars = loan_df.select_dtypes(include='object').columns.tolist()
 vars_for_dummies = np.setdiff1d(object_vars,['addr_state', 'zip_code'])
 
+# save the original columns before getting dummies
 tmp_df = loan_df[vars_for_dummies]
-loan_df = pd.get_dummies(loan_df,columns=vars_for_dummies,drop_first=True)
+loan_df = pd.get_dummies(loan_df,columns=vars_for_dummies,drop_first=True) 
 
+# impute data for remaining columns that still have missingness
 missing_cols = loan_df.columns[loan_df.isnull().any()].tolist()
 
 clean_df = impute_missing_continuous(loan_df, missing_columns=missing_cols,
                                      cols_to_exclude=['fully_paid','issue_d', 'zip_code', 'addr_state'])
 
+# add original (non-dummy) columns back for easy visualization in EDA (they will be removed prior to model training)
 for col in vars_for_dummies:
     clean_df[col] = tmp_df[col]
-
+    
 print(sorted(clean_df.columns.tolist()))
 ```
 
@@ -2054,6 +2057,7 @@ print(clean_df.shape)
 
 
 ```python
+# save as pkl
 clean_df.to_pickle('./data/Pickle/clean_df_for_eda.pkl')
 
 ```
@@ -2100,7 +2104,7 @@ Descriptions of the remaining variables are provided below. Except for a few var
 <br>We were unable to change this to a continuous variable but we reduced the number of categorical bins to help reduce potential overfitting (and to create categorical bins with similar numbers of samples within each bin). We will treated nulls as 0 years worked as they most often appear when no 'emp_title' was listed.
 
 `grade`: LC assigned loan grade
-<br>We processed this to make it an ordinal variable, with lower values indicating less-risky loans.
+<br>We processed this to make it an ordinal variable, with lower values indicating less-risky loans. 
 
 `home_ownership`: The home ownership status provided by the borrower during registration or obtained from the credit report. Our values are: RENT, OWN, MORTGAGE, OTHER
 <br>We simply used pd.get_dummies to process this column.
@@ -2186,7 +2190,7 @@ We simply used pd.get_dummies to process this variable.
 <br> We not that this variable was originally a string percent (%). We processed this variable to cast it to float. (While processing, we temporarily set nulls as -1 to cast the column to float.)
 
 `sub_grade` - LC assigned loan subgrade
-<br>We processed this to make it an ordinal variable, with lower values indicating less-risky loans.
+<br>We processed this to make it an ordinal variable, with lower values indicating less-risky loans. 
 
 `tax_liens`: Number of tax liens
 
