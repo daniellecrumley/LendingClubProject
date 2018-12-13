@@ -1,7 +1,7 @@
 ---
-title: Fairness: Bias Detection and Mitigation
+title: Fairness - Bias Detection and Mitigation
 notebook: Fairness.ipynb
-nav_include: 5
+nav_include : 5
 ---
 
 ## Contents
@@ -351,7 +351,7 @@ print("Test set: False negative rate difference = %f" % classified_metric_nodebi
 
 
 
-**Plain model - without debiasing - classification metrics**
+#### Plain model - without debiasing - classification metrics
 
 
     Test set: Classification accuracy = 0.652441
