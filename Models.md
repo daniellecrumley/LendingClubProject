@@ -20,7 +20,7 @@ We have chosen to limit ourselves to decision tree-based algorithms because they
 
 
 
-```
+```python
 import requests
 from IPython.core.display import HTML
 styles = requests.get("https://raw.githubusercontent.com/Harvard-IACS/2018-CS109A/master/content/styles/cs109.css").text
@@ -57,7 +57,7 @@ warnings.filterwarnings('ignore')
 
 
 
-```
+```python
 import os
 
 #Google Collab Only
@@ -69,14 +69,14 @@ drive.mount('/content/gdrive', force_remount=False)
 
 
 
-```
+```python
 clean_df = pd.read_pickle('/content/gdrive/My Drive/Lending Club Project/data/Pickle/clean_df_Mon.pkl').sample(frac=.10, random_state=0)
 ```
 
 
 
 
-```
+```python
 #clean_df = pd.read_pickle('./data/Pickle/clean_df.pkl').sample(frac=.10, random_state=0)
 
 print(clean_df.shape)
@@ -103,14 +103,14 @@ First, for comparison purposes, we compute an accuracy score from a trival model
 
 
 
-```
+```python
 importances = ['int_rate', 'sub_grade', 'dti', 'installment', 'avg_cur_bal', 'credit_line_age', 'bc_open_to_buy', 'mo_sin_old_rev_tl_op', 'annual_inc', 'mo_sin_old_il_acct', 'tot_hi_cred_lim', 'revol_util', 'bc_util', 'revol_bal', 'tot_cur_bal', 'total_rev_hi_lim', 'total_bal_ex_mort', 'total_bc_limit', 'loan_amnt', 'total_il_high_credit_limit', 'grade', 'mths_since_recent_bc', 'total_acc', 'mo_sin_rcnt_rev_tl_op', 'num_rev_accts', 'num_il_tl', 'mths_since_recent_inq', 'mo_sin_rcnt_tl', 'num_bc_tl', 'acc_open_past_24mths', 'num_sats', 'open_acc', 'pct_tl_nvr_dlq', 'num_op_rev_tl', 'mths_since_last_delinq', 'percent_bc_gt_75', 'num_rev_tl_bal_gt_0', 'num_actv_rev_tl', 'num_bc_sats', 'num_tl_op_past_12m', 'term_ 60 months', 'num_actv_bc_tl', 'mths_since_recent_revol_delinq', 'mort_acc', 'mths_since_last_major_derog', 'tot_coll_amt', 'mths_since_recent_bc_dlq', 'mths_since_last_record', 'inq_last_6mths', 'num_accts_ever_120_pd', 'delinq_2yrs', 'pub_rec', 'verification_status_Verified', 'verification_status_Source Verified', 'emp_length_10+ years', 'purpose_debt_consolidation', 'emp_length_5-9 years', 'emp_length_2-4 years', 'home_ownership_RENT', 'home_ownership_MORTGAGE', 'purpose_credit_card', 'pub_rec_bankruptcies', 'home_ownership_OWN', 'num_tl_90g_dpd_24m', 'tax_liens', 'purpose_home_improvement', 'purpose_other', 'collections_12_mths_ex_med', 'purpose_major_purchase', 'purpose_small_business', 'purpose_medical', 'application_type_Joint App', 'purpose_moving', 'chargeoff_within_12_mths', 'delinq_amnt', 'purpose_vacation', 'purpose_house', 'acc_now_delinq', 'purpose_wedding', 'purpose_renewable_energy', 'home_ownership_OTHER', 'home_ownership_NONE', 'purpose_educational']
 ```
 
 
 
 
-```
+```python
 top_15_features = importances[:15]
 ```
 
@@ -122,7 +122,7 @@ top_15_features = importances[:15]
 
 
 
-```
+```python
 most_common_class = data_train[outcome].value_counts().idxmax()
 
 ## training set baseline accuracy
@@ -142,7 +142,7 @@ We store various performance metrics; in addition to the accuracy score, we also
 
 
 
-```
+```python
 data_train_baseline = data_train[top_15_features+[outcome]]
 data_val_baseline = data_val[top_15_features+[outcome]]
 
@@ -151,7 +151,7 @@ data_val_baseline = data_val[top_15_features+[outcome]]
 
 
 
-```
+```python
 
 def compare_tree_models(data_train, data_val, outcome, class_weights=[None], max_depths=range(2,21)):
     X_train = data_train.drop(columns=outcome)
@@ -449,7 +449,7 @@ results_table
 
 
 
-```
+```python
 
 def print_confusion_matrix(confusion_matrix, class_names, figsize = (10,7), fontsize=14):
     """Prints a confusion matrix, as returned by sklearn.metrics.confusion_matrix, as a heatmap.
@@ -490,7 +490,7 @@ def print_confusion_matrix(confusion_matrix, class_names, figsize = (10,7), font
 
 
 
-```
+```python
 best_model_index = results_table['Val Accuracy'].idxmax()
 cm = results_list[best_model_index]['Val CM']
 
@@ -512,12 +512,636 @@ Going forward, we should also place more weight (i.e., by modifyinng the `class_
 2. For the purposes of building a sound, reasonably low-risk investment strategy, we hope to minimize the particular error in which the model predicts a loan to be fully paid when it is truly charged off. We will tune the class_weight parameter in future models to select an optimal value for our purposes.
 
 
+## <font color='maroon'>Feature Engineering Attempts</font>
+
+To enhance model performance while tuning our models, , we explored generating additional features not in the raw data set to potentially catch additional relationships in the response variable. 
+
+Our attempts included interaction variables between top features, as well as polynomial terms with degree 2. Unfortunately, we did not see any notable model performance from these changes, so they were not included in our final model. 
+
+There are many other higher-order polynomial and interaction terms and combinations of relevant/related predictors that could also be fine-tuned into better summary variables to boost model performance. This feature engineering step is an area where there is room for substantial improvement upon our model in the future. 
+
+
+
+```python
+def sum_cols_to_new_feature(df, new_feature_name, cols_to_sum, drop=True):
+    new_df = df.copy()
+    new_df[new_feature_name] = 0
+    for col in cols_to_sum:
+        new_df[new_feature_name] = new_df[new_feature_name] + new_df[col]
+    if drop:
+        new_df = new_df.drop(columns=cols_to_sum)
+    return new_df
+
+def add_interactions(loandf):
+    df = loandf.copy()
+    df['int_rate_X_sub_grade'] = df['int_rate']*df['sub_grade']
+    df['installment_X_sub_grade'] = df['installment']*df['sub_grade']
+    df['installment_X_int_rate'] = df['installment']*df['int_rate']
+    df['int_rate_X_sub_grade_X_installment'] = df['int_rate']*df['sub_grade']*df['installment']
+    df['dti_X_sub_grade'] = df['dti']*df['sub_grade']
+    df['mo_sin_old_rev_tl_op_X_sub_grade'] = df['mo_sin_old_rev_tl_op']*df['sub_grade']
+    df['dti_X_mo_sin_old_rev_tl_op_X_sub_grade'] = df['dti']*df['mo_sin_old_rev_tl_op']*df['sub_grade']
+    df['income_to_loan_amount'] = df['annual_inc']/df['loan_amnt']
+    df['dti_X_income'] = df['dti']*df['annual_inc']
+    df['dti_X_income_X_loan_amnt'] = df['annual_inc']*df['loan_amnt']*df['dti']
+    df['dti_X_loan_amnt'] = df['dti']*df['loan_amnt']
+    df['avg_cur_bal_X_dti'] = df['avg_cur_bal']*df['dti']
+    
+    return df
+
+
+```
+
+
+
+
+```python
+outcome='fully_paid'
+#clean_df = pd.read_pickle('./data/Pickle/clean_df.pkl').sample(frac=0.05, random_state=0)
+clean_df = pd.read_pickle('/content/gdrive/My Drive/Lending Club Project/data/Pickle/clean_df_Mon.pkl').sample(frac=.05, random_state=0)
+
+
+clean_df = add_interactions(clean_df)
+clean_df = sum_cols_to_new_feature(clean_df, new_feature_name='months_since_delinq_combined',
+            cols_to_sum=['mths_since_last_delinq', 'mths_since_last_major_derog','mths_since_last_record',
+            'mths_since_recent_bc_dlq', 'mths_since_recent_revol_delinq'], drop=True)
+
+clean_df = sum_cols_to_new_feature(clean_df, new_feature_name='num_bad_records',
+            cols_to_sum=['num_accts_ever_120_pd','num_tl_90g_dpd_24m','pub_rec',
+                         'pub_rec_bankruptcies', 'tax_liens'], drop=True)
+clean_df = sum_cols_to_new_feature(clean_df, new_feature_name='combined_credit_lim',
+            cols_to_sum=['tot_hi_cred_lim','total_bc_limit','total_il_high_credit_limit',
+                         'total_rev_hi_lim',], drop=True)
+
+clean_df = sum_cols_to_new_feature(clean_df, new_feature_name='num_recent_delinq',
+            cols_to_sum=['delinq_2yrs', 'chargeoff_within_12_mths', 'collections_12_mths_ex_med'], drop=True)
+
+clean_df = sum_cols_to_new_feature(clean_df, new_feature_name='num_accounts',
+            cols_to_sum=['num_bc_tl', 'num_il_tl', 'num_op_rev_tl', 'num_rev_accts',
+                         'num_actv_rev_tl', 'num_actv_bc_tl', 'mort_acc'], drop=True)
+                         
+
+clean_df = clean_df.drop(columns = ['issue_d', 'zip_code', 'addr_state'])
+data_train, data_test = train_test_split(clean_df, test_size=.1, stratify=clean_df[outcome], random_state=99);
+
+X_train = data_train.drop(columns=outcome)
+y_train = data_train[outcome]
+rf_model = RandomForestClassifier(n_estimators=50, max_depth=50).fit(X_train, y_train)
+                         
+importances = pd.DataFrame({'Columns':X_train.columns,'Feature_Importances':rf_model.feature_importances_})
+importances = importances.sort_values(by='Feature_Importances',ascending=False)
+print(importances['Columns'].values.tolist()[:15])
+```
+
+
+    ['dti_X_sub_grade', 'int_rate', 'int_rate_X_sub_grade_X_installment', 'int_rate_X_sub_grade', 'dti_X_mo_sin_old_rev_tl_op_X_sub_grade', 'dti', 'income_to_loan_amount', 'avg_cur_bal', 'dti_X_loan_amnt', 'mo_sin_old_il_acct', 'mo_sin_old_rev_tl_op_X_sub_grade', 'bc_open_to_buy', 'installment_X_sub_grade', 'sub_grade', 'revol_bal']
+
+
+
+
+```python
+
+def compare_tree_models(data_train, data_val, outcome, class_weights=[None], max_depths=range(2,21)):
+    X_train = data_train.drop(columns=outcome)
+    y_train = data_train[outcome]
+    X_val = data_val.drop(columns=outcome)
+    y_val = data_val[outcome]
+
+    tree_results = []
+    for class_weight in class_weights:
+        for depth in max_depths:
+            clf = DecisionTreeClassifier(criterion='gini', max_depth=depth, class_weight=class_weight)
+            clf.fit(X_train, y_train)
+
+            y_train_pred = clf.predict(X_train)
+            y_val_pred = clf.predict(X_val)
+
+            train_accuracy = accuracy_score(y_train, y_train_pred)
+            train_balanced_accuracy = balanced_accuracy_score(y_train, y_train_pred)
+            train_precision = precision_score(y_train, y_train_pred)
+            train_cm = confusion_matrix(y_train, y_train_pred)
+
+            val_accuracy = accuracy_score(y_val, y_val_pred)
+            val_balanced_accuracy = balanced_accuracy_score(y_val, y_val_pred)
+            val_precision = precision_score(y_val, y_val_pred)
+            val_cm = confusion_matrix(y_val, y_val_pred)
+
+            tree_results.append({'Depth': depth,
+                                    'class_weight': class_weight,
+                                    'Train Accuracy': train_accuracy,
+                                    'Train Balanced Accuracy': train_balanced_accuracy,
+                                    'Train Precision': train_precision,
+                                    'Train CM': train_cm,
+                                    'Val Accuracy': val_accuracy,
+                                    'Val Balanced Accuracy': val_balanced_accuracy,
+                                    'Val Precision': val_precision,
+                                    'Val CM': val_cm})
+    return tree_results
+
+
+results = compare_tree_models(data_train, data_test,\
+            outcome='fully_paid', class_weights=[None, 'balanced', {0:5, 1:1},{0:6, 1:1}, {0:7, 1:1}, {0:8, 1:1}])
+
+
+
+```
+
+
+
+
+```python
+columns=['Depth', 'class_weight', 'Train Accuracy','Train Precision', 'Val Accuracy','Val Precision']
+
+scores_table = pd.DataFrame(results, columns=columns)
+
+msk = scores_table['Val Precision'] >= 0.9
+scores_table[msk].sort_values(by='Val Accuracy', ascending=False).head()
+```
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Depth</th>
+      <th>class_weight</th>
+      <th>Train Accuracy</th>
+      <th>Train Precision</th>
+      <th>Val Accuracy</th>
+      <th>Val Precision</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>40</th>
+      <td>4</td>
+      <td>{0: 5, 1: 1}</td>
+      <td>0.530919</td>
+      <td>0.908322</td>
+      <td>0.523170</td>
+      <td>0.902159</td>
+    </tr>
+    <tr>
+      <th>59</th>
+      <td>4</td>
+      <td>{0: 6, 1: 1}</td>
+      <td>0.530919</td>
+      <td>0.908322</td>
+      <td>0.523170</td>
+      <td>0.902159</td>
+    </tr>
+    <tr>
+      <th>62</th>
+      <td>7</td>
+      <td>{0: 6, 1: 1}</td>
+      <td>0.538950</td>
+      <td>0.921664</td>
+      <td>0.517286</td>
+      <td>0.900326</td>
+    </tr>
+    <tr>
+      <th>78</th>
+      <td>4</td>
+      <td>{0: 7, 1: 1}</td>
+      <td>0.474292</td>
+      <td>0.917505</td>
+      <td>0.470394</td>
+      <td>0.914966</td>
+    </tr>
+    <tr>
+      <th>81</th>
+      <td>7</td>
+      <td>{0: 7, 1: 1}</td>
+      <td>0.487657</td>
+      <td>0.932268</td>
+      <td>0.465612</td>
+      <td>0.904842</td>
+    </tr>
+    <tr>
+      <th>83</th>
+      <td>9</td>
+      <td>{0: 7, 1: 1}</td>
+      <td>0.495504</td>
+      <td>0.954543</td>
+      <td>0.460280</td>
+      <td>0.906520</td>
+    </tr>
+    <tr>
+      <th>82</th>
+      <td>8</td>
+      <td>{0: 7, 1: 1}</td>
+      <td>0.482609</td>
+      <td>0.943900</td>
+      <td>0.458073</td>
+      <td>0.903991</td>
+    </tr>
+    <tr>
+      <th>79</th>
+      <td>5</td>
+      <td>{0: 7, 1: 1}</td>
+      <td>0.460804</td>
+      <td>0.922437</td>
+      <td>0.457705</td>
+      <td>0.917415</td>
+    </tr>
+    <tr>
+      <th>77</th>
+      <td>3</td>
+      <td>{0: 7, 1: 1}</td>
+      <td>0.458843</td>
+      <td>0.918520</td>
+      <td>0.455866</td>
+      <td>0.914423</td>
+    </tr>
+    <tr>
+      <th>96</th>
+      <td>3</td>
+      <td>{0: 8, 1: 1}</td>
+      <td>0.458843</td>
+      <td>0.918520</td>
+      <td>0.455866</td>
+      <td>0.914423</td>
+    </tr>
+    <tr>
+      <th>102</th>
+      <td>9</td>
+      <td>{0: 8, 1: 1}</td>
+      <td>0.486145</td>
+      <td>0.956453</td>
+      <td>0.449430</td>
+      <td>0.904676</td>
+    </tr>
+    <tr>
+      <th>101</th>
+      <td>8</td>
+      <td>{0: 8, 1: 1}</td>
+      <td>0.470062</td>
+      <td>0.946868</td>
+      <td>0.448327</td>
+      <td>0.908759</td>
+    </tr>
+    <tr>
+      <th>80</th>
+      <td>6</td>
+      <td>{0: 7, 1: 1}</td>
+      <td>0.451036</td>
+      <td>0.930842</td>
+      <td>0.445200</td>
+      <td>0.920203</td>
+    </tr>
+    <tr>
+      <th>99</th>
+      <td>6</td>
+      <td>{0: 8, 1: 1}</td>
+      <td>0.451956</td>
+      <td>0.931425</td>
+      <td>0.443545</td>
+      <td>0.918679</td>
+    </tr>
+    <tr>
+      <th>100</th>
+      <td>7</td>
+      <td>{0: 8, 1: 1}</td>
+      <td>0.463461</td>
+      <td>0.938127</td>
+      <td>0.442810</td>
+      <td>0.911654</td>
+    </tr>
+    <tr>
+      <th>97</th>
+      <td>4</td>
+      <td>{0: 8, 1: 1}</td>
+      <td>0.412556</td>
+      <td>0.930116</td>
+      <td>0.416146</td>
+      <td>0.939144</td>
+    </tr>
+    <tr>
+      <th>98</th>
+      <td>5</td>
+      <td>{0: 8, 1: 1}</td>
+      <td>0.401459</td>
+      <td>0.936237</td>
+      <td>0.405112</td>
+      <td>0.943955</td>
+    </tr>
+    <tr>
+      <th>95</th>
+      <td>2</td>
+      <td>{0: 8, 1: 1}</td>
+      <td>0.336453</td>
+      <td>0.940714</td>
+      <td>0.342221</td>
+      <td>0.947491</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+
+```python
+
+clean_df = pd.read_pickle('/content/gdrive/My Drive/Lending Club Project/data/Pickle/clean_df_Mon.pkl').sample(frac=.05, random_state=0)
+clean_df = clean_df.drop(columns = ['issue_d', 'zip_code', 'addr_state'])
+data_train, data_test = train_test_split(clean_df, test_size=.1, stratify=clean_df[outcome], random_state=99);
+
+X_train = data_train.drop(columns=outcome)
+y_train = data_train[outcome]
+
+results = compare_tree_models(data_train, data_test,\
+            outcome='fully_paid', class_weights=[None, 'balanced', {0:5, 1:1},{0:6, 1:1}, {0:7, 1:1}, {0:8, 1:1}])
+
+
+
+```
+
+
+
+
+```python
+columns=['Depth', 'class_weight', 'Train Accuracy','Train Precision', 'Val Accuracy','Val Precision']
+
+scores_table = pd.DataFrame(results, columns=columns)
+
+msk = scores_table['Val Precision'] >= 0.9
+scores_table[msk].sort_values(by='Val Accuracy', ascending=False).head()
+```
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Depth</th>
+      <th>class_weight</th>
+      <th>Train Accuracy</th>
+      <th>Train Precision</th>
+      <th>Val Accuracy</th>
+      <th>Val Precision</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>41</th>
+      <td>5</td>
+      <td>{0: 5, 1: 1}</td>
+      <td>0.550170</td>
+      <td>0.905982</td>
+      <td>0.546157</td>
+      <td>0.900171</td>
+    </tr>
+    <tr>
+      <th>42</th>
+      <td>6</td>
+      <td>{0: 5, 1: 1}</td>
+      <td>0.549413</td>
+      <td>0.910787</td>
+      <td>0.541192</td>
+      <td>0.901085</td>
+    </tr>
+    <tr>
+      <th>62</th>
+      <td>7</td>
+      <td>{0: 6, 1: 1}</td>
+      <td>0.530613</td>
+      <td>0.922110</td>
+      <td>0.521883</td>
+      <td>0.900735</td>
+    </tr>
+    <tr>
+      <th>61</th>
+      <td>6</td>
+      <td>{0: 6, 1: 1}</td>
+      <td>0.525259</td>
+      <td>0.916513</td>
+      <td>0.520780</td>
+      <td>0.905317</td>
+    </tr>
+    <tr>
+      <th>60</th>
+      <td>5</td>
+      <td>{0: 6, 1: 1}</td>
+      <td>0.519434</td>
+      <td>0.912385</td>
+      <td>0.516182</td>
+      <td>0.905732</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+
+```python
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import PolynomialFeatures
+
+X_train = data_train.drop(columns=outcome)
+y_train = data_train[outcome]
+X_val = data_test.drop(columns=outcome)
+y_val = data_test[outcome]
+
+scores = []
+for i in range(2,11):
+    print(i)
+    clf = make_pipeline(PolynomialFeatures(degree=2, include_bias=False),
+                            DecisionTreeClassifier(criterion='gini', max_depth=i,
+                            class_weight={0:5, 1:1}))
+
+    clf.fit(X_train, y_train)
+
+    y_train_pred = clf.predict(X_train)
+    y_val_pred = clf.predict(X_val)
+
+    train_accuracy = accuracy_score(y_train, y_train_pred)
+    train_balanced_accuracy = balanced_accuracy_score(y_train, y_train_pred)
+    train_precision = precision_score(y_train, y_train_pred)
+    train_cm = confusion_matrix(y_train, y_train_pred)
+
+    val_accuracy = accuracy_score(y_val, y_val_pred)
+    val_balanced_accuracy = balanced_accuracy_score(y_val, y_val_pred)
+    val_precision = precision_score(y_val, y_val_pred)
+    val_cm = confusion_matrix(y_val, y_val_pred)
+
+    scores.append({'Depth': i,
+                            'Train Accuracy': train_accuracy,
+                            'Train Balanced Accuracy': train_balanced_accuracy,
+                            'Train Precision': train_precision,
+                            'Val Accuracy': val_accuracy,
+                            'Val Balanced Accuracy': val_balanced_accuracy,
+                            'Val Precision': val_precision,})
+
+    clear_output()
+        
+columns=['Depth', 'Train Accuracy','Train Precision', 'Val Accuracy','Val Precision']
+scores_table = pd.DataFrame(scores, columns=columns)
+msk = scores_table['Val Precision'] >= 0.9
+scores_table[msk].sort_values(by='Val Accuracy', ascending=False).head()
+```
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Depth</th>
+      <th>Train Accuracy</th>
+      <th>Train Precision</th>
+      <th>Val Accuracy</th>
+      <th>Val Precision</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+</div>
+
+
+
+
+
+```python
+scores_table.sort_values(by='Val Precision', ascending=False).head()
+```
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Depth</th>
+      <th>Train Accuracy</th>
+      <th>Train Precision</th>
+      <th>Val Accuracy</th>
+      <th>Val Precision</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2</td>
+      <td>0.520517</td>
+      <td>0.905729</td>
+      <td>0.514160</td>
+      <td>0.899906</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+      <td>0.520517</td>
+      <td>0.905729</td>
+      <td>0.514160</td>
+      <td>0.899906</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>6</td>
+      <td>0.590060</td>
+      <td>0.907898</td>
+      <td>0.584038</td>
+      <td>0.894917</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5</td>
+      <td>0.579168</td>
+      <td>0.903548</td>
+      <td>0.574476</td>
+      <td>0.894328</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>7</td>
+      <td>0.604753</td>
+      <td>0.911508</td>
+      <td>0.587900</td>
+      <td>0.890167</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 ## <font color='maroon'>Decision Tree Model Tuning/Comparison</font>
 
 
 
 
-```
+```python
 clean_df = pd.read_pickle('/content/gdrive/My Drive/Lending Club Project/data/Pickle/clean_df_Mon.pkl').sample(frac=.05, random_state=0)
 
 outcome='fully_paid'
@@ -540,7 +1164,7 @@ importances = ['int_rate', 'sub_grade', 'dti', 'installment', 'avg_cur_bal', 'mo
 
 
 
-```
+```python
 scores = []
 features = []
 for column in importances:
@@ -620,7 +1244,7 @@ tree_scores = tree_scores[table_col_names]
 
 
 
-```
+```python
 path = '/content/gdrive/My Drive/Lending Club Project/data/Victor/'
 #tree_scores.to_csv(path+'tree_scores.csv',index=False)
 tree_scores = pd.read_csv(path+'tree_scores.csv')
@@ -769,7 +1393,7 @@ tree_scores[(tree_scores['Val Precision']>=0.9)&(tree_scores['Test Precision']>=
 
 
 
-```
+```python
 rf_scores = []
 features = []
 for column in importances[:20]:
@@ -853,7 +1477,7 @@ rf_scores = rf_scores[table_col_names]
 
 
 
-```
+```python
 path = '/content/gdrive/My Drive/Lending Club Project/data/Victor/'
 #rf_scores.to_csv(path+'rf_scores.csv',index=False)
 rf_scores = pd.read_csv(path+'rf_scores.csv')
@@ -1001,7 +1625,7 @@ rf_scores[(rf_scores['Val Precision']>=0.9)&(rf_scores['Test Precision']>=0.9)].
 
 
 
-```
+```python
 clean_df = pd.read_pickle('/content/gdrive/My Drive/Lending Club Project/data/Pickle/clean_df_Mon.pkl')
 
 print('Total Number of Rows:', '{:,}'.format(clean_df.shape[0]))
@@ -1015,7 +1639,7 @@ print('Total Number of Columns:', '{:,}'.format(clean_df.shape[1]))
 
 
 
-```
+```python
 outcome='fully_paid'
 
 data_train, data_test = train_test_split(clean_df, test_size=.1, stratify=clean_df[outcome], random_state=99);
@@ -1031,14 +1655,14 @@ print(data_train.shape, data_val.shape)
 
 
 
-```
+```python
 importances = ['int_rate', 'sub_grade', 'dti', 'installment', 'avg_cur_bal', 'mo_sin_old_rev_tl_op', 'bc_open_to_buy', 'credit_line_age', 'tot_hi_cred_lim', 'annual_inc', 'revol_util', 'bc_util', 'mo_sin_old_il_acct', 'revol_bal', 'total_rev_hi_lim', 'total_bc_limit', 'tot_cur_bal', 'total_bal_ex_mort', 'loan_amnt', 'total_il_high_credit_limit', 'mths_since_recent_bc', 'total_acc', 'mo_sin_rcnt_rev_tl_op', 'num_rev_accts', 'num_il_tl', 'grade', 'mths_since_recent_inq', 'mo_sin_rcnt_tl', 'num_bc_tl', 'acc_open_past_24mths', 'open_acc', 'num_sats', 'pct_tl_nvr_dlq', 'num_op_rev_tl', 'mths_since_last_delinq', 'percent_bc_gt_75', 'term_ 60 months', 'num_actv_rev_tl', 'num_rev_tl_bal_gt_0', 'num_bc_sats', 'num_actv_bc_tl', 'num_tl_op_past_12m', 'mths_since_recent_revol_delinq', 'mort_acc', 'mths_since_last_major_derog', 'mths_since_recent_bc_dlq', 'tot_coll_amt', 'mths_since_last_record', 'inq_last_6mths', 'num_accts_ever_120_pd', 'delinq_2yrs', 'pub_rec', 'verification_status_Verified', 'verification_status_Source Verified', 'emp_length_10+ years', 'purpose_debt_consolidation', 'emp_length_5-9 years', 'emp_length_2-4 years', 'home_ownership_RENT', 'purpose_credit_card', 'pub_rec_bankruptcies', 'home_ownership_MORTGAGE', 'home_ownership_OWN', 'num_tl_90g_dpd_24m', 'tax_liens', 'purpose_other', 'purpose_home_improvement', 'collections_12_mths_ex_med', 'purpose_major_purchase', 'purpose_small_business', 'purpose_medical', 'application_type_Joint App', 'purpose_moving', 'chargeoff_within_12_mths', 'purpose_vacation', 'delinq_amnt', 'purpose_house', 'acc_now_delinq', 'purpose_renewable_energy', 'purpose_wedding', 'home_ownership_OTHER', 'home_ownership_NONE', 'purpose_educational']
 ```
 
 
 
 
-```
+```python
 features = importances[0:43]
 depth = 8
 weight = 6
@@ -1062,7 +1686,7 @@ rf_model = RandomForestClassifier(n_estimators=50, max_depth=8, class_weight={0:
 
 
 
-```
+```python
 data_test['RF_Model_Prediction'] = rf_model.predict(X_test) 
 data_test['RF_Probability_Fully_Paid'] = rf_model.predict_proba(X_test)[:,1]
 
@@ -1071,7 +1695,7 @@ data_test['RF_Probability_Fully_Paid'] = rf_model.predict_proba(X_test)[:,1]
 
 
 
-```
+```python
 features = importances[0:13]
 depth = 5
 weight = 5
@@ -1092,7 +1716,7 @@ rf_model = DecisionTreeClassifier(max_depth=depth, class_weight={0:weight, 1:1})
 
 
 
-```
+```python
 data_test['Tree_Model_Prediction'] = rf_model.predict(X_test) 
 data_test['Tree_Probability_Fully_Paid'] = rf_model.predict_proba(X_test)[:,1]
 
@@ -1101,7 +1725,7 @@ data_test['Tree_Probability_Fully_Paid'] = rf_model.predict_proba(X_test)[:,1]
 
 
 
-```
+```python
 data_test[['RF_Model_Prediction','Tree_Model_Prediction','RF_Probability_Fully_Paid','Tree_Probability_Fully_Paid']].describe()
 ```
 
@@ -1200,7 +1824,7 @@ With similar total funded fully paid loans between the best Decision Tree and Ra
 
 
 
-```
+```python
 fig, ax = plt.subplots(figsize=(16,10))
 
 sns.distplot(data_test[data_test['fully_paid']==1]['RF_Probability_Fully_Paid'],color='green',rug=False,label='Fully Paid')
@@ -1216,12 +1840,12 @@ sns.despine()
 
 
 
-![png](Models_files/Models_35_0.png)
+![png](Models_files/Models_44_0.png)
 
 
 
 
-```
+```python
 fig, ax = plt.subplots(figsize=(16,10))
 
 sns.distplot(data_test[data_test['fully_paid']==1]['Tree_Probability_Fully_Paid'],color='green',rug=False,label='Fully Paid')
@@ -1238,12 +1862,12 @@ sns.despine()
 
 
 
-![png](Models_files/Models_36_0.png)
+![png](Models_files/Models_45_0.png)
 
 
 
 
-```
+```python
 from sklearn.calibration import calibration_curve
 rf_positive_frac, rf_mean_score = calibration_curve(y_test, data_test['RF_Probability_Fully_Paid'].values, n_bins=25)
 tree_positive_frac, tree_mean_score = calibration_curve(y_test, data_test['Tree_Probability_Fully_Paid'].values, n_bins=25)
@@ -1265,7 +1889,7 @@ sns.despine()
 
 
 
-![png](Models_files/Models_37_0.png)
+![png](Models_files/Models_46_0.png)
 
 
 Because we chose models with a high base precision, the calibration curve is not suprising. 

@@ -1,5 +1,5 @@
 ---
-title: Exploratory Data Analysis
+title: EDA
 notebook: EDA.ipynb
 nav_include: 2
 ---
@@ -11,7 +11,7 @@ nav_include: 2
 
 
 
-EDA revealed some interesting trends in the data. We explore some of these trends below. 
+Exploratory data analysis revealed some interesting trends in the data. We explore some of these trends below. 
 
 **Imports**
 
