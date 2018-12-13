@@ -1,8 +1,8 @@
 ## <img style="float: left; padding-right: 10px; width: 45px" src="https://raw.githubusercontent.com/Harvard-IACS/2018-CS109A/master/content/styles/iacs.png"> CS109A Introduction to Data Science
 
-# Lending Club Investments Project: Overview
+## Lending Club Investments Project: Overview
 
-# <img style="float: right; padding-right: 10px; width: 50px" src="https://i.imgur.com/2ptDvXd.png">
+## <img style="float: right; padding-right: 10px; width: 150px" src="https://i.imgur.com/2ptDvXd.png">
 
 **Harvard University**<br/>
 **CSCI E-109A**<br/>
