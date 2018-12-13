@@ -1,5 +1,14 @@
+---
+title: Model Training and Tuning
+notebook: Models.ipynb
+nav_include: 3
+---
 
-# Model Tuning and Results
+## Contents
+{:.no_toc}
+*  
+{: toc}
+
 
 
 When building and testing models for real-world use, we should choose model performance metrics based on the goal and usage of the model. In our case, we will be focusing on a high precision bar where the positive outcome is a fully paid off loan and then maximizing the total number of true positives. 
@@ -49,7 +58,6 @@ warnings.filterwarnings('ignore')
 
 
 ```
-# For Colab
 import os
 
 #Google Collab Only
@@ -74,7 +82,6 @@ clean_df = pd.read_pickle('/content/gdrive/My Drive/Lending Club Project/data/Pi
 print(clean_df.shape)
 outcome='fully_paid'
 
-# split into train and validation sets
 data_train, data_val = train_test_split(clean_df, test_size=.1, stratify=clean_df[outcome], random_state=99);
 
 X_train = data_train.drop(columns=['issue_d', 'zip_code', 'addr_state', outcome])
@@ -97,7 +104,6 @@ First, for comparison purposes, we compute an accuracy score from a trival model
 
 
 ```
-# these are the features ordered by random forest feature
 importances = ['int_rate', 'sub_grade', 'dti', 'installment', 'avg_cur_bal', 'credit_line_age', 'bc_open_to_buy', 'mo_sin_old_rev_tl_op', 'annual_inc', 'mo_sin_old_il_acct', 'tot_hi_cred_lim', 'revol_util', 'bc_util', 'revol_bal', 'tot_cur_bal', 'total_rev_hi_lim', 'total_bal_ex_mort', 'total_bc_limit', 'loan_amnt', 'total_il_high_credit_limit', 'grade', 'mths_since_recent_bc', 'total_acc', 'mo_sin_rcnt_rev_tl_op', 'num_rev_accts', 'num_il_tl', 'mths_since_recent_inq', 'mo_sin_rcnt_tl', 'num_bc_tl', 'acc_open_past_24mths', 'num_sats', 'open_acc', 'pct_tl_nvr_dlq', 'num_op_rev_tl', 'mths_since_last_delinq', 'percent_bc_gt_75', 'num_rev_tl_bal_gt_0', 'num_actv_rev_tl', 'num_bc_sats', 'num_tl_op_past_12m', 'term_ 60 months', 'num_actv_bc_tl', 'mths_since_recent_revol_delinq', 'mort_acc', 'mths_since_last_major_derog', 'tot_coll_amt', 'mths_since_recent_bc_dlq', 'mths_since_last_record', 'inq_last_6mths', 'num_accts_ever_120_pd', 'delinq_2yrs', 'pub_rec', 'verification_status_Verified', 'verification_status_Source Verified', 'emp_length_10+ years', 'purpose_debt_consolidation', 'emp_length_5-9 years', 'emp_length_2-4 years', 'home_ownership_RENT', 'home_ownership_MORTGAGE', 'purpose_credit_card', 'pub_rec_bankruptcies', 'home_ownership_OWN', 'num_tl_90g_dpd_24m', 'tax_liens', 'purpose_home_improvement', 'purpose_other', 'collections_12_mths_ex_med', 'purpose_major_purchase', 'purpose_small_business', 'purpose_medical', 'application_type_Joint App', 'purpose_moving', 'chargeoff_within_12_mths', 'delinq_amnt', 'purpose_vacation', 'purpose_house', 'acc_now_delinq', 'purpose_wedding', 'purpose_renewable_energy', 'home_ownership_OTHER', 'home_ownership_NONE', 'purpose_educational']
 ```
 
@@ -137,7 +143,6 @@ We store various performance metrics; in addition to the accuracy score, we also
 
 
 ```
-# Subset to top features 
 data_train_baseline = data_train[top_15_features+[outcome]]
 data_val_baseline = data_val[top_15_features+[outcome]]
 
@@ -147,7 +152,6 @@ data_val_baseline = data_val[top_15_features+[outcome]]
 
 
 ```
-# Compare baseline models: Decision trees of depth 2 to 20
 
 def compare_tree_models(data_train, data_val, outcome, class_weights=[None], max_depths=range(2,21)):
     X_train = data_train.drop(columns=outcome)
@@ -446,7 +450,6 @@ results_table
 
 
 ```
-# print_confusion_matrix function taken from https://gist.github.com/shaypal5/94c53d765083101efc0240d776a23823
 
 def print_confusion_matrix(confusion_matrix, class_names, figsize = (10,7), fontsize=14):
     """Prints a confusion matrix, as returned by sklearn.metrics.confusion_matrix, as a heatmap.
@@ -488,7 +491,6 @@ def print_confusion_matrix(confusion_matrix, class_names, figsize = (10,7), font
 
 
 ```
-# Select model with best validation accuracy score and plot its confusion matrix
 best_model_index = results_table['Val Accuracy'].idxmax()
 cm = results_list[best_model_index]['Val CM']
 
@@ -528,7 +530,6 @@ print(data_train.shape, data_val.shape)
 X_train = data_train.drop(columns=['issue_d', 'zip_code', 'addr_state', outcome])
 y_train = data_train[outcome]
 
-# Feature importances from RF
 importances = ['int_rate', 'sub_grade', 'dti', 'installment', 'avg_cur_bal', 'mo_sin_old_rev_tl_op', 'bc_open_to_buy', 'credit_line_age', 'tot_hi_cred_lim', 'annual_inc', 'revol_util', 'bc_util', 'mo_sin_old_il_acct', 'revol_bal', 'total_rev_hi_lim', 'total_bc_limit', 'tot_cur_bal', 'total_bal_ex_mort', 'loan_amnt', 'total_il_high_credit_limit', 'mths_since_recent_bc', 'total_acc', 'mo_sin_rcnt_rev_tl_op', 'num_rev_accts', 'num_il_tl', 'grade', 'mths_since_recent_inq', 'mo_sin_rcnt_tl', 'num_bc_tl', 'acc_open_past_24mths', 'open_acc', 'num_sats', 'pct_tl_nvr_dlq', 'num_op_rev_tl', 'mths_since_last_delinq', 'percent_bc_gt_75', 'term_ 60 months', 'num_actv_rev_tl', 'num_rev_tl_bal_gt_0', 'num_bc_sats', 'num_actv_bc_tl', 'num_tl_op_past_12m', 'mths_since_recent_revol_delinq', 'mort_acc', 'mths_since_last_major_derog', 'mths_since_recent_bc_dlq', 'tot_coll_amt', 'mths_since_last_record', 'inq_last_6mths', 'num_accts_ever_120_pd', 'delinq_2yrs', 'pub_rec', 'verification_status_Verified', 'verification_status_Source Verified', 'emp_length_10+ years', 'purpose_debt_consolidation', 'emp_length_5-9 years', 'emp_length_2-4 years', 'home_ownership_RENT', 'purpose_credit_card', 'pub_rec_bankruptcies', 'home_ownership_MORTGAGE', 'home_ownership_OWN', 'num_tl_90g_dpd_24m', 'tax_liens', 'purpose_other', 'purpose_home_improvement', 'collections_12_mths_ex_med', 'purpose_major_purchase', 'purpose_small_business', 'purpose_medical', 'application_type_Joint App', 'purpose_moving', 'chargeoff_within_12_mths', 'purpose_vacation', 'delinq_amnt', 'purpose_house', 'acc_now_delinq', 'purpose_renewable_energy', 'purpose_wedding', 'home_ownership_OTHER', 'home_ownership_NONE', 'purpose_educational']
 ```
 
@@ -620,7 +621,6 @@ tree_scores = tree_scores[table_col_names]
 
 
 ```
-# Save the model results to access/compare later
 path = '/content/gdrive/My Drive/Lending Club Project/data/Victor/'
 #tree_scores.to_csv(path+'tree_scores.csv',index=False)
 tree_scores = pd.read_csv(path+'tree_scores.csv')
@@ -854,7 +854,6 @@ rf_scores = rf_scores[table_col_names]
 
 
 ```
-# Store results to CSV file
 path = '/content/gdrive/My Drive/Lending Club Project/data/Victor/'
 #rf_scores.to_csv(path+'rf_scores.csv',index=False)
 rf_scores = pd.read_csv(path+'rf_scores.csv')
@@ -1017,7 +1016,6 @@ print('Total Number of Columns:', '{:,}'.format(clean_df.shape[1]))
 
 
 ```
-# Subset to top features 
 outcome='fully_paid'
 
 data_train, data_test = train_test_split(clean_df, test_size=.1, stratify=clean_df[outcome], random_state=99);

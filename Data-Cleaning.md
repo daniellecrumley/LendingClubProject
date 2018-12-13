@@ -1,5 +1,14 @@
+---
+title: Data Cleaning and Pre-Processing
+notebook: Data-Cleaning.ipynb
+nav_include: 1
+---
 
-# Data Collection, Cleaning, and Pre-Processing
+## Contents
+{:.no_toc}
+*  
+{: toc}
+
 
 
 ## <font color='maroon'>Data Collection</font>
@@ -1024,7 +1033,6 @@ get_missing_values_table(loan_df).head(15)
 ```python
 print("Number of rows in dataset: {}".format (loan_df.shape[0]))
 
-# removing data from loans issued prior to 2012-08-01
 loan_df = loan_df[loan_df['issue_d']>=datetime(2012,8,1)]
 
 
@@ -1488,7 +1496,6 @@ loan_df = process_loan_cols(loan_df)
 
 
 ```python
-# check which cols still have missing values
 missing_data = get_missing_values_table(loan_df)
 display(missing_data[missing_data.Missing_Count!=0])
 missing_cols = missing_data[missing_data.Missing_Count!=0].index
@@ -1651,7 +1658,6 @@ types_df = pd.DataFrame(loan_df.dtypes,columns=['Types'])
 display(types_df[types_df['Types']!='float64'].sort_values(by='Types'))
 
 
-# get list of variables that need dummy encoding
 object_vars=loan_df.select_dtypes(include='object').columns.tolist()
 object_vars = np.setdiff1d(object_vars,['addr_state', 'zip_code'])
 print(object_vars)
@@ -1808,7 +1814,6 @@ clean_df = impute_missing_continuous(loan_df, missing_columns=missing_cols, cols
 
 
 ```python
-# verify that we no longer have null values
 clean_df.isnull().values.any()
 ```
 
@@ -1986,7 +1991,6 @@ Since we worked on a subset above, we redo our cleaning on the full dataset and 
 ```python
 loan_df = pd.read_pickle('./data/Pickle/loan_df0.pkl')
 
-# this includes co-borrower columns
 exclude = ['id', 'member_id', 'url', 'next_pymnt_d', 'pymnt_plan', 'out_prncp',
            'out_prncp_inv', 'policy_code', 'open_acc_6m', 'open_act_il', 'open_il_12m',
            'open_il_24m', 'total_bal_il', 'open_rv_12m', 'open_rv_24m', 'max_bal_bc',
@@ -2008,31 +2012,24 @@ exclude = ['id', 'member_id', 'url', 'next_pymnt_d', 'pymnt_plan', 'out_prncp',
            'sec_app_open_acc', 'sec_app_open_act_il', 'sec_app_revol_util',
            'verification_status_joint']
 
-# remove above columns
 potential_features = np.setdiff1d(loan_df.columns.tolist(), exclude)
 loan_df = loan_df[potential_features]
 
-# removing data from loans issued prior to 2012-08-01
 loan_df = loan_df[loan_df['issue_d']>=datetime(2012,8,1)]
 
-# process the columns that we identified as needing to be pre-processed
 loan_df = process_loan_cols(loan_df)
 
-# dummy-encoding for certain columns
 object_vars = loan_df.select_dtypes(include='object').columns.tolist()
 vars_for_dummies = np.setdiff1d(object_vars,['addr_state', 'zip_code'])
 
-# save the original columns before getting dummies
 tmp_df = loan_df[vars_for_dummies]
 loan_df = pd.get_dummies(loan_df,columns=vars_for_dummies,drop_first=True) 
 
-# impute data for remaining columns that still have missingness
 missing_cols = loan_df.columns[loan_df.isnull().any()].tolist()
 
 clean_df = impute_missing_continuous(loan_df, missing_columns=missing_cols,
                                      cols_to_exclude=['fully_paid','issue_d', 'zip_code', 'addr_state'])
 
-# add original (non-dummy) columns back for easy visualization in EDA (they will be removed prior to model training)
 for col in vars_for_dummies:
     clean_df[col] = tmp_df[col]
     
@@ -2057,7 +2054,6 @@ print(clean_df.shape)
 
 
 ```python
-# save as pkl
 clean_df.to_pickle('./data/Pickle/clean_df_for_eda.pkl')
 
 ```

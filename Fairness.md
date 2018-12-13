@@ -1,5 +1,14 @@
+---
+title: Fairness: Bias Detection and Mitigation
+notebook: Fairness.ipynb
+nav_include: 4
+---
 
-# Fairness: Bias Detection and Mitigation
+## Contents
+{:.no_toc}
+*  
+{: toc}
+
 
 Back before the introduction of credit score systems, local bankers were tasked with the job of approving or denying loans. – they controlled the money. If someone wanted to take out a mortgage or loan, they would have to appease the aforementioned bankers. He would have access to the application form which would showcase income and other relevant information. However, consciously or not, other factors will come into play, such as standing in the local community, piety, age, race and gender. This is problematic as the banker might favor people, he is close to, as opposed to outsiders. This routinely put minorities and women at a disadvantage. A better system had to be created. 
 
@@ -119,10 +128,8 @@ print(os.listdir(path))
 
 census_data= pd.read_csv(path+filename)
 
-# read in census data
 #census_data = pd.read_csv('census_zipcode_level.csv')
 
-# generate 3-digit zip
 census_data['zip_code_3dig'] = census_data['Zip'].apply(lambda x: (str(x))[:3])
 
 #new df aggregated based on 3-digit zip code
@@ -130,7 +137,6 @@ zip3_df = census_data.groupby('zip_code_3dig').agg({'Population':np.sum, 'White'
 zip3_df['percent_white'] = zip3_df['White']/zip3_df['Population']
 display(zip3_df.head())
 
-# underprivileged group will be those 3-digit zipcodes in the bottom-quarter of "percent_white"
 cutoff = zip3_df.percent_white.quantile(0.05) # about ## white
 zip3_df['underprivileged'] = zip3_df.percent_white.apply(lambda x: x<=cutoff).astype(int)
 underprivileged_zips = np.array(zip3_df[zip3_df.underprivileged==1].index)
